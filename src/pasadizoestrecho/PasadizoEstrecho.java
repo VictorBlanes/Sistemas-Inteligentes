@@ -114,17 +114,17 @@ public class PasadizoEstrecho extends JFrame implements MouseListener, KeyListen
             int i = 0, j = 0;
             boolean encontrado = false;
             //Busca la casilla que ha clickado el usuario
-            for (i = 0; i < Tablero.DIMENSION && !encontrado; i++) {
-                for (j = 0; j < Tablero.DIMENSION && !encontrado; j++) {
+            for (i = 0; i < Tablero.CASILLAS_POR_LADO && !encontrado; i++) {
+                for (j = 0; j < Tablero.CASILLAS_POR_LADO && !encontrado; j++) {
                     encontrado = tablero.esCasilla(i, j, x, y);
                 }
             }
             --i;
             --j;
             // El primer if evita que el usuario pueda eliminar los bordes del mapa
-            if (!(i == 0 || j == 0 || i == (Tablero.DIMENSION - 1) || j == (Tablero.DIMENSION - 1))) {
+            if (!(i == 0 || j == 0 || i == (Tablero.CASILLAS_POR_LADO - 1) || j == (Tablero.CASILLAS_POR_LADO - 1))) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                    tablero.ocuparDesocupar(i, j);
+                    tablero.ocuparLiberarCasilla(i, j);
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     tablero.setPlayer(i, j);
                 }
