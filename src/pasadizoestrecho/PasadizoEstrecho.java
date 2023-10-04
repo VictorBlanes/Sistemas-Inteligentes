@@ -116,7 +116,7 @@ public class PasadizoEstrecho extends JFrame implements MouseListener, KeyListen
             //Busca la casilla que ha clickado el usuario
             for (i = 0; i < Tablero.CASILLAS_POR_LADO && !encontrado; i++) {
                 for (j = 0; j < Tablero.CASILLAS_POR_LADO && !encontrado; j++) {
-                    encontrado = tablero.esCasilla(i, j, x, y);
+                    encontrado = tablero.isPixelOnCasilla(i, j, x, y);
                 }
             }
             --i;

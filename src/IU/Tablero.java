@@ -5,11 +5,11 @@ import pasadizoestrecho.ConjuntoAcciones;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 
 import static IU.EstadoCasilla.JUGADOR;
 import static IU.EstadoCasilla.NADA;
 import static IU.EstadoCasilla.OCUPADA;
+import static java.util.Objects.isNull;
 
 /**
  * @author Victor Manuel Blanes Castro
@@ -22,7 +22,9 @@ public class Tablero extends JPanel {
     private static final Color BLANCO = new Color(242, 242, 242);
     private static final Color NEGRO = new Color(230, 230, 230);
     private Casilla tablero[][];
-    private boolean jugadorEnMapa = false;
+
+    //TODO: Ver como juntar isOnMapLimit y checkIfInBounds
+    //TODO: Ver de cambiar tablero de un array a una lista
 
     public Tablero() {
         Color colorCasilla;
@@ -58,8 +60,8 @@ public class Tablero extends JPanel {
         return new Dimension(DIMENSION_TABLERO_PX, DIMENSION_TABLERO_PX);
     }
 
-    public boolean esCasilla(int i, int j, int x, int y) {
-        return tablero[i][j].getRectangle().contains(x, y);
+    public boolean isPixelOnCasilla(int pos_x, int pos_y, int pixel_coord_x, int pixel_coord_y) {
+        return tablero[pos_x][pos_y].getRectangle().contains(pixel_coord_x, pixel_coord_y);
     }
 
     public EstadoCasilla estaOcupado(int i, int j) {
@@ -74,40 +76,80 @@ public class Tablero extends JPanel {
         }
     }
 
-    public void setPlayer(int i, int j) {
-        if ((tablero[i][j].getObjetoEnCasilla() == NADA) && !jugadorEnMapa) {
-            tablero[i][j].setObjetoEnCasilla(JUGADOR);
-            jugadorEnMapa = true;
-        } else if (tablero[i][j].getObjetoEnCasilla() == JUGADOR) {
-            tablero[i][j].setObjetoEnCasilla(NADA);
-            jugadorEnMapa = false;
+    public void setPlayer(int pos_x, int pos_y) {
+        Coordenada coordenadaOfPlayer = retrieveCasillaWithPlayer();
+        if (isNull(coordenadaOfPlayer)) {
+            tablero[pos_x][pos_y].setObjetoEnCasilla(JUGADOR);
+        } else {
+            tablero[coordenadaOfPlayer.X][coordenadaOfPlayer.Y].setObjetoEnCasilla(NADA);
+            tablero[pos_x][pos_y].setObjetoEnCasilla(JUGADOR);
         }
     }
 
-    public void moverPlayer(ConjuntoAcciones accion) {
-        boolean encontrado = false;
-        int i = 0, j = 0;
-        for (i = 0; i < Tablero.CASILLAS_POR_LADO && !encontrado; i++) {
-            for (j = 0; j < Tablero.CASILLAS_POR_LADO && !encontrado; j++) {
-                encontrado
-                        = tablero[i][j].getObjetoEnCasilla().equals(JUGADOR);
+    private Coordenada retrieveCasillaWithPlayer() {
+        for (int pos_x = 0; pos_x < CASILLAS_POR_LADO; pos_x++) {
+            for (int pos_y = 0; pos_y < CASILLAS_POR_LADO; pos_y++) {
+                if (tablero[pos_x][pos_y].getObjetoEnCasilla() == JUGADOR) {
+                    return new Coordenada(pos_x, pos_y);
+                }
             }
         }
-        tablero[--i][--j].setObjetoEnCasilla(NADA);
-        if (encontrado) {
-            switch (accion) {
-                case NORTE -> tablero[--i][j].setObjetoEnCasilla(JUGADOR);
-                case SUR -> tablero[++i][j].setObjetoEnCasilla(JUGADOR);
-                case ESTE -> tablero[i][++j].setObjetoEnCasilla(JUGADOR);
-                case OESTE -> tablero[i][--j].setObjetoEnCasilla(JUGADOR);
+        return null;
+    }
+
+    private Casilla getNearCasilla(Coordenada coordenada, ConjuntoAcciones posicionVecina) throws CustomException {
+        switch (posicionVecina) {
+            case NORTE -> {
+                checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y));
+                return tablero[coordenada.X - 1][coordenada.Y];
             }
+            case SUR -> {
+                checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y));
+                return tablero[coordenada.X + 1][coordenada.Y];
+            }
+            case ESTE -> {
+                checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y + 1));
+                return tablero[coordenada.X][coordenada.Y + 1];
+            }
+            case OESTE -> {
+                checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y - 1));
+                return tablero[coordenada.X][coordenada.Y - 1];
+            }
+            default -> {
+                return tablero[coordenada.X][coordenada.Y];
+            }
+        }
+    }
+
+    private void checkIfInBounds(Coordenada coordenada) throws CustomException {
+        if (coordenada.X < 0 || coordenada.Y < 0) {
+            throw new CustomException(String.format("Error: Se ha intentado acceder a una posicion no valida: [%d, %d]",
+                    coordenada.X, coordenada.Y));
+        }
+
+        if (coordenada.X > CASILLAS_POR_LADO - 1 || coordenada.Y > CASILLAS_POR_LADO - 1) {
+            throw new CustomException(String.format("Error: Se ha intentado acceder a una posicion no valida: [%d, %d]",
+                    coordenada.X, coordenada.Y));
+        }
+    }
+
+    public void moverPlayer(ConjuntoAcciones accion) throws CustomException {
+        Coordenada coordinates = retrieveCasillaWithPlayer();
+        if (isNull(coordinates)) {
+            throw new CustomException(String.format("Error: Se ha intentado mover %s al jugador, pero no hay jugador en el tablero", accion));
+        }
+
+        tablero[coordinates.X][coordinates.Y].setObjetoEnCasilla(NADA);
+        Casilla casilla = getNearCasilla(coordinates, accion);
+        if (casilla.getObjetoEnCasilla() == OCUPADA) {
+            throw new CustomException(String.format("Error: El jugador ha intentado moverse %s a una casilla ocupada, casilla actual [%d, %d]",
+                    accion, coordinates.X, coordinates.Y));
         }
     }
 
     public void resizeArray(int dim) {
         CASILLAS_POR_LADO = dim;
         DIMENSION_CASILLA_PX = DIMENSION_TABLERO_PX / CASILLAS_POR_LADO;
-        boolean player = false;
         Casilla t2[][] = new Casilla[CASILLAS_POR_LADO][CASILLAS_POR_LADO];
         int y = 0;
         for (int i = 0; i < CASILLAS_POR_LADO; i++) {
@@ -130,7 +172,6 @@ public class Tablero extends JPanel {
             y += DIMENSION_CASILLA_PX;
         }
         tablero = t2;
-        jugadorEnMapa = player;
     }
 
     public Rectangle getRectangle(int i, int j) {
