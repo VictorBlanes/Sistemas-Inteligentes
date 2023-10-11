@@ -1,5 +1,6 @@
 package pasadizoestrecho;
 
+import IU.CustomException;
 import IU.Tablero;
 
 import java.util.concurrent.Semaphore;
@@ -74,7 +75,7 @@ public class Agente {
         A partir del vector de caracteristicas y la accion anterior elige 
         que accion tomar.
      */
-    public void efecAccion(Tablero tbl) {
+    public void efecAccion(Tablero tbl) throws CustomException {
         while (true) {
             ConjuntoAcciones accion = null;
             percibir(tbl);

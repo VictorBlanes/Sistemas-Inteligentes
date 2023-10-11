@@ -1,5 +1,6 @@
 package pasadizoestrecho;
 
+import IU.CustomException;
 import IU.Tablero;
 
 import javax.swing.*;
@@ -158,10 +159,10 @@ public class PasadizoEstrecho extends JFrame implements MouseListener, KeyListen
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private static void startRobot() {
+    private static void startRobot() throws CustomException {
         robot.efecAccion(tablero);
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CustomException {
         PasadizoEstrecho pe = new PasadizoEstrecho();
         pe.setVisible(true);
         startRobot();

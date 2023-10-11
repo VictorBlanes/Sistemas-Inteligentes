@@ -27,10 +27,20 @@ public class Tablero extends JPanel {
     //TODO: Ver de cambiar tablero de un array a una lista
 
     public Tablero() {
+        initializeTablero(CASILLAS_POR_LADO);
+    }
+
+    public void resizeArray(int dim) {
+        CASILLAS_POR_LADO = dim;
+        DIMENSION_CASILLA_PX = DIMENSION_TABLERO_PX / CASILLAS_POR_LADO;
+        initializeTablero(dim);
+    }
+
+    private void initializeTablero(int dimension) {
         Color colorCasilla;
-        tablero = new Casilla[CASILLAS_POR_LADO][CASILLAS_POR_LADO];
-        for (int pos_x = 0; pos_x < CASILLAS_POR_LADO; pos_x++) {
-            for (int pos_y = 0; pos_y < CASILLAS_POR_LADO; pos_y++) {
+        Casilla[][] tablero = new Casilla[dimension][dimension];
+        for (int pos_x = 0; pos_x < dimension; pos_x++) {
+            for (int pos_y = 0; pos_y < dimension; pos_y++) {
                 Rectangle2D.Float rectanguloCasilla = new Rectangle2D.Float(
                         pos_x * DIMENSION_CASILLA_PX,
                         pos_y * DIMENSION_CASILLA_PX,
@@ -40,6 +50,7 @@ public class Tablero extends JPanel {
                 tablero[pos_x][pos_y] = new Casilla(rectanguloCasilla, colorCasilla, isOnMapLimit(pos_x, pos_y) ? OCUPADA : NADA);
             }
         }
+        this.tablero = tablero;
     }
 
     private boolean isOnMapLimit(int pos_x, int pos_y) {
@@ -62,10 +73,6 @@ public class Tablero extends JPanel {
 
     public boolean isPixelOnCasilla(int pos_x, int pos_y, int pixel_coord_x, int pixel_coord_y) {
         return tablero[pos_x][pos_y].getRectangle().contains(pixel_coord_x, pixel_coord_y);
-    }
-
-    public EstadoCasilla estaOcupado(int i, int j) {
-        return tablero[i][j].getObjetoEnCasilla();
     }
 
     public void ocuparLiberarCasilla(int pos_x, int pos_y) {
@@ -99,25 +106,19 @@ public class Tablero extends JPanel {
 
     private Casilla getNearCasilla(Coordenada coordenada, ConjuntoAcciones posicionVecina) throws CustomException {
         switch (posicionVecina) {
-            case NORTE -> {
-                checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y));
-                return tablero[coordenada.X - 1][coordenada.Y];
-            }
-            case SUR -> {
+            case NORTE:
+                checkIfInBounds(new Coordenada(coordenada.Y, coordenada.Y + 1));
+                return tablero[coordenada.X][coordenada.X + 1];
+            case SUR:
+                checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y - 1));
+                return tablero[coordenada.X][coordenada.X - 1];
+            case ESTE:
                 checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y));
                 return tablero[coordenada.X + 1][coordenada.Y];
-            }
-            case ESTE -> {
-                checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y + 1));
-                return tablero[coordenada.X][coordenada.Y + 1];
-            }
-            case OESTE -> {
-                checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y - 1));
-                return tablero[coordenada.X][coordenada.Y - 1];
-            }
-            default -> {
-                return tablero[coordenada.X][coordenada.Y];
-            }
+            default:
+            case OESTE:
+                checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y));
+                return tablero[coordenada.X - 1][coordenada.Y];
         }
     }
 
@@ -145,37 +146,7 @@ public class Tablero extends JPanel {
             throw new CustomException(String.format("Error: El jugador ha intentado moverse %s a una casilla ocupada, casilla actual [%d, %d]",
                     accion, coordinates.X, coordinates.Y));
         }
-    }
-
-    public void resizeArray(int dim) {
-        CASILLAS_POR_LADO = dim;
-        DIMENSION_CASILLA_PX = DIMENSION_TABLERO_PX / CASILLAS_POR_LADO;
-        Casilla t2[][] = new Casilla[CASILLAS_POR_LADO][CASILLAS_POR_LADO];
-        int y = 0;
-        for (int i = 0; i < CASILLAS_POR_LADO; i++) {
-            int x = 0;
-            for (int j = 0; j < CASILLAS_POR_LADO; j++) {
-                Rectangle2D.Float r = new Rectangle2D.Float(x, y, DIMENSION_CASILLA_PX, DIMENSION_CASILLA_PX);
-                Color col;
-                if ((i % 2 == 1 && j % 2 == 1) || (i % 2 == 0 && j % 2 == 0)) {
-                    col = BLANCO;
-                } else {
-                    col = NEGRO;
-                }
-                if (i == 0 || j == 0 || i == (CASILLAS_POR_LADO - 1) || j == (CASILLAS_POR_LADO - 1)) {
-                    t2[i][j] = new Casilla(r, col, OCUPADA);
-                } else {
-                    t2[i][j] = new Casilla(r, col, NADA);
-                }
-                x += DIMENSION_CASILLA_PX;
-            }
-            y += DIMENSION_CASILLA_PX;
-        }
-        tablero = t2;
-    }
-
-    public Rectangle getRectangle(int i, int j) {
-        return tablero[i][j].getRectangle().getBounds();
+        casilla.setObjetoEnCasilla(JUGADOR);
     }
 
     public boolean[] setPercepciones() {
