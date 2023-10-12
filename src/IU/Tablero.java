@@ -48,10 +48,14 @@ public class Tablero extends JPanel {
                         DIMENSION_CASILLA_PX,
                         DIMENSION_CASILLA_PX);
                 colorCasilla = (pos_x % 2 == pos_y % 2) ? BLANCO : NEGRO;
-                tablero[pos_x][pos_y] = new Casilla(rectanguloCasilla, colorCasilla, checkIfInBounds(new Coordenada(pos_x, pos_y)) ? OCUPADA : NADA);
+                tablero[pos_x][pos_y] = new Casilla(rectanguloCasilla, colorCasilla, isOnMapLimit(new Coordenada(pos_x, pos_y)) ? OCUPADA : NADA);
             }
         }
         this.tablero = tablero;
+    }
+
+    private boolean isOnMapLimit(Coordenada coordenada) {
+        return (coordenada.X == 0 || coordenada.Y == 0 || coordenada.X == (CASILLAS_POR_LADO - 1) || coordenada.Y == (CASILLAS_POR_LADO - 1));
     }
 
     @Override
@@ -102,30 +106,31 @@ public class Tablero extends JPanel {
     }
 
     private Casilla getNearCasilla(Coordenada coordenada, CasillasAdyacentes posicionVecina) {
+        //Norte va para abajo y Sur para arriba debido a como java pinta la pantalla del tablero
         switch (posicionVecina) {
             case NORTE:
-                return checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y + 1)) ? tablero[coordenada.X][coordenada.Y + 1] : null;
-            case SUR:
                 return checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y - 1)) ? tablero[coordenada.X][coordenada.Y - 1] : null;
+            case SUR:
+                return checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y + 1)) ? tablero[coordenada.X][coordenada.Y + 1] : null;
             case ESTE:
                 return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y)) ? tablero[coordenada.X + 1][coordenada.Y] : null;
             case OESTE:
                 return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y)) ? tablero[coordenada.X - 1][coordenada.Y] : null;
             case NORESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y + 1)) ? tablero[coordenada.X + 1][coordenada.Y + 1] : null;
-            case NOROESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y + 1)) ? tablero[coordenada.X - 1][coordenada.Y + 1] : null;
-            case SURESTE:
                 return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y - 1)) ? tablero[coordenada.X + 1][coordenada.Y - 1] : null;
-            case SUROESTE:
+            case NOROESTE:
                 return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y - 1)) ? tablero[coordenada.X - 1][coordenada.Y - 1] : null;
+            case SURESTE:
+                return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y + 1)) ? tablero[coordenada.X + 1][coordenada.Y + 1] : null;
+            case SUROESTE:
+                return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y + 1)) ? tablero[coordenada.X - 1][coordenada.Y + 1] : null;
             default:
                 return tablero[coordenada.X][coordenada.Y];
         }
     }
 
     private boolean checkIfInBounds(Coordenada coordenada) {
-        return (coordenada.X <= 0 || coordenada.Y <= 0 || coordenada.X >= (CASILLAS_POR_LADO - 1) || coordenada.Y >= (CASILLAS_POR_LADO - 1));
+        return (coordenada.X >= 0 || coordenada.Y >= 0 || coordenada.X <= (CASILLAS_POR_LADO - 1) || coordenada.Y <= (CASILLAS_POR_LADO - 1));
     }
 
     public void moverPlayer(CasillasAdyacentes accion) throws CustomException {
@@ -140,7 +145,6 @@ public class Tablero extends JPanel {
             throw new CustomException(String.format("Error: Se ha intentado acceder a una posicion no valida: [%d, %d] moviendo %s",
                     coordinates.X, coordinates.Y, accion));
         }
-        System.out.printf("Estoy en la posicion [%d, %d] y me voy a mover %s\n", coordinates.X, coordinates.Y, accion);
         if (casilla.getObjetoEnCasilla() == OCUPADA) {
             throw new CustomException(String.format("Error: El jugador ha intentado moverse %s a una casilla ocupada, casilla actual [%d, %d]",
                     accion, coordinates.X, coordinates.Y));
@@ -151,14 +155,14 @@ public class Tablero extends JPanel {
     public boolean[] setPercepciones() {
         Coordenada jugador = retrieveCasillaWithPlayer();
         boolean[] percepciones = new boolean[8];
-        percepciones[0] = (!isNull(getNearCasilla(jugador, NOROESTE)) && getNearCasilla(jugador, NOROESTE).getObjetoEnCasilla() == OCUPADA);
-        percepciones[1] = (!isNull(getNearCasilla(jugador, NORTE)) && getNearCasilla(jugador, NORTE).getObjetoEnCasilla() == OCUPADA);
-        percepciones[2] = (!isNull(getNearCasilla(jugador, NORESTE)) && getNearCasilla(jugador, NORESTE).getObjetoEnCasilla() == OCUPADA);
-        percepciones[3] = (!isNull(getNearCasilla(jugador, ESTE)) && getNearCasilla(jugador, ESTE).getObjetoEnCasilla() == OCUPADA);
-        percepciones[4] = (!isNull(getNearCasilla(jugador, SURESTE)) && getNearCasilla(jugador, SURESTE).getObjetoEnCasilla() == OCUPADA);
-        percepciones[5] = (!isNull(getNearCasilla(jugador, SUR)) && getNearCasilla(jugador, SUR).getObjetoEnCasilla() == OCUPADA);
-        percepciones[6] = (!isNull(getNearCasilla(jugador, SUROESTE)) && getNearCasilla(jugador, SUROESTE).getObjetoEnCasilla() == OCUPADA);
-        percepciones[7] = (!isNull(getNearCasilla(jugador, OESTE)) && getNearCasilla(jugador, OESTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[0] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, NOROESTE)) && getNearCasilla(jugador, NOROESTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[1] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, NORTE)) && getNearCasilla(jugador, NORTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[2] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, NORESTE)) && getNearCasilla(jugador, NORESTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[3] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, ESTE)) && getNearCasilla(jugador, ESTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[4] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, SURESTE)) && getNearCasilla(jugador, SURESTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[5] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, SUR)) && getNearCasilla(jugador, SUR).getObjetoEnCasilla() == OCUPADA);
+        percepciones[6] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, SUROESTE)) && getNearCasilla(jugador, SUROESTE).getObjetoEnCasilla() == OCUPADA);
+        percepciones[7] = (!isNull(jugador) && !isNull(getNearCasilla(jugador, OESTE)) && getNearCasilla(jugador, OESTE).getObjetoEnCasilla() == OCUPADA);
         return percepciones;
     }
 }
