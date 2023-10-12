@@ -22,7 +22,7 @@ public class Tablero extends JPanel {
     private static int DIMENSION_CASILLA_PX = DIMENSION_TABLERO_PX / CASILLAS_POR_LADO;
     private static final Color BLANCO = new Color(242, 242, 242);
     private static final Color NEGRO = new Color(230, 230, 230);
-    private Casilla tablero[][];
+    private Casilla[][] tablero;
 
     //TODO: A lo mejor ver de usar optionals
     //TODO: Mirar de cambiar lo de coordenadas para no crear tantos nuevos objetos
@@ -107,26 +107,24 @@ public class Tablero extends JPanel {
 
     private Casilla getNearCasilla(Coordenada coordenada, CasillasAdyacentes posicionVecina) {
         //Norte va para abajo y Sur para arriba debido a como java pinta la pantalla del tablero
-        switch (posicionVecina) {
-            case NORTE:
-                return checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y - 1)) ? tablero[coordenada.X][coordenada.Y - 1] : null;
-            case SUR:
-                return checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y + 1)) ? tablero[coordenada.X][coordenada.Y + 1] : null;
-            case ESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y)) ? tablero[coordenada.X + 1][coordenada.Y] : null;
-            case OESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y)) ? tablero[coordenada.X - 1][coordenada.Y] : null;
-            case NORESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y - 1)) ? tablero[coordenada.X + 1][coordenada.Y - 1] : null;
-            case NOROESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y - 1)) ? tablero[coordenada.X - 1][coordenada.Y - 1] : null;
-            case SURESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y + 1)) ? tablero[coordenada.X + 1][coordenada.Y + 1] : null;
-            case SUROESTE:
-                return checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y + 1)) ? tablero[coordenada.X - 1][coordenada.Y + 1] : null;
-            default:
-                return tablero[coordenada.X][coordenada.Y];
-        }
+        return switch (posicionVecina) {
+            case NORTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y - 1)) ? tablero[coordenada.X][coordenada.Y - 1] : null;
+            case SUR ->
+                    checkIfInBounds(new Coordenada(coordenada.X, coordenada.Y + 1)) ? tablero[coordenada.X][coordenada.Y + 1] : null;
+            case ESTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y)) ? tablero[coordenada.X + 1][coordenada.Y] : null;
+            case OESTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y)) ? tablero[coordenada.X - 1][coordenada.Y] : null;
+            case NORESTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y - 1)) ? tablero[coordenada.X + 1][coordenada.Y - 1] : null;
+            case NOROESTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y - 1)) ? tablero[coordenada.X - 1][coordenada.Y - 1] : null;
+            case SURESTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X + 1, coordenada.Y + 1)) ? tablero[coordenada.X + 1][coordenada.Y + 1] : null;
+            case SUROESTE ->
+                    checkIfInBounds(new Coordenada(coordenada.X - 1, coordenada.Y + 1)) ? tablero[coordenada.X - 1][coordenada.Y + 1] : null;
+        };
     }
 
     private boolean checkIfInBounds(Coordenada coordenada) {
