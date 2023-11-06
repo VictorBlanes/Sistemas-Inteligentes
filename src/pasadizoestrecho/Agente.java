@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Victor Manuel Blanes Castro
  */
 public class Agente {
@@ -76,7 +75,7 @@ public class Agente {
      */
     public void efecAccion(Tablero tbl) throws CustomException {
         while (true) {
-            CasillasAdyacentes accion = null;
+            CasillasAdyacentes accion;
             percibir(tbl);
             actVecCaracteristicas();
             try {
@@ -88,134 +87,124 @@ public class Agente {
             } catch (InterruptedException ex) {
                 Logger.getLogger(Agente.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if (lastAccion == CasillasAdyacentes.ESTE && lastVecCaracteristicas[V_CARDINALES]) {
-                // Por defecto intenta continuar en la misma direccion que la anterior, 
-                // si no puede va comprobando si puede rotar en sentido antihorario
-                if (vecCaracteristicas[V_NORTE]) {
-                    if (vecCaracteristicas[V_ESTE]) {
-                        if (vecCaracteristicas[V_SUR]) {
-                            accion = CasillasAdyacentes.OESTE;
-                        } else {
-                            accion = CasillasAdyacentes.SUR;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.ESTE;
-                    }
-                } else {
-                    accion = CasillasAdyacentes.NORTE;
-                }
-            } else if (lastAccion == CasillasAdyacentes.SUR && lastVecCaracteristicas[V_CARDINALES]) {
-                if (vecCaracteristicas[V_ESTE]) {
-                    if (vecCaracteristicas[V_SUR]) {
-                        if (vecCaracteristicas[V_OESTE]) {
-                            accion = CasillasAdyacentes.NORTE;
-                        } else {
-                            accion = CasillasAdyacentes.OESTE;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.SUR;
-                    }
-                } else {
-                    accion = CasillasAdyacentes.ESTE;
-                }
-            } else if (lastAccion == CasillasAdyacentes.OESTE && lastVecCaracteristicas[V_CARDINALES]) {
-                if (vecCaracteristicas[V_SUR]) {
-                    if (vecCaracteristicas[V_OESTE]) {
-                        if (vecCaracteristicas[V_NORTE]) {
-                            accion = CasillasAdyacentes.ESTE;
-                        } else {
-                            accion = CasillasAdyacentes.NORTE;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.OESTE;
-                    }
-                } else {
-                    accion = CasillasAdyacentes.SUR;
-                }
-            } else if (lastAccion == CasillasAdyacentes.NORTE && lastVecCaracteristicas[V_CARDINALES]) {
-                if (vecCaracteristicas[V_OESTE]) {
-                    if (vecCaracteristicas[V_NORTE]) {
-                        if (vecCaracteristicas[V_ESTE]) {
-                            accion = CasillasAdyacentes.SUR;
-                        } else {
-                            accion = CasillasAdyacentes.ESTE;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.NORTE;
-                    }
-                } else {
-                    accion = CasillasAdyacentes.OESTE;
-                }
-            } else if (vecCaracteristicas[V_CARDINALES] && lastVecCaracteristicas[V_INTERCARDINALES]
-                    && !lastVecCaracteristicas[V_CARDINALES]) { //"Se encarga de la accion posterior a una rotacion"
-                // Reevalua la direccion que tiene que seguir en el caso posterior a un cambio de direccion
-                // Por defecto intenta continuar en la misma direccion que habia tomado
-                // Si no puede, intenta girar en sentido antihorario
-                if (lastAccion == CasillasAdyacentes.OESTE) {
-                    if (vecCaracteristicas[V_OESTE]) {
-                        if (vecCaracteristicas[V_NORTE]) {
-                            accion = CasillasAdyacentes.ESTE;
-                        } else {
-                            accion = CasillasAdyacentes.NORTE;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.OESTE;
-                    }
-                } else if (lastAccion == CasillasAdyacentes.ESTE) {
-                    if (vecCaracteristicas[V_ESTE]) {
-                        if (vecCaracteristicas[V_SUR]) {
-                            accion = CasillasAdyacentes.OESTE;
-                        } else {
-                            accion = CasillasAdyacentes.SUR;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.ESTE;
-                    }
-                } else if (lastAccion == CasillasAdyacentes.NORTE) {
-                    if (vecCaracteristicas[V_NORTE]) {
-                        if (vecCaracteristicas[V_ESTE]) {
-                            accion = CasillasAdyacentes.SUR;
-                        } else {
-                            accion = CasillasAdyacentes.ESTE;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.NORTE;
-                    }
-                } else if (lastAccion == CasillasAdyacentes.SUR) {
-                    if (vecCaracteristicas[V_SUR]) {
-                        if (vecCaracteristicas[V_OESTE]) {
-                            accion = CasillasAdyacentes.NORTE;
-                        } else {
-                            accion = CasillasAdyacentes.OESTE;
-                        }
-                    } else {
-                        accion = CasillasAdyacentes.SUR;
-                    }
-                }
-            } else {
-                // Accion por defecto, por defecto el agente ira norte, si no 
-                // puede ir norte intentara girar en sentido horario
-                if (vecCaracteristicas[V_CARDINALES]) {
-                    if (vecCaracteristicas[V_NORTE]) {
-                        if (vecCaracteristicas[V_ESTE]) {
-                            accion = CasillasAdyacentes.SUR;
-                        } else {
-                            accion = CasillasAdyacentes.ESTE;
-                        }
-                    } else if (vecCaracteristicas[V_ESTE]) {
-                        accion = CasillasAdyacentes.SUR;
-                    } else if (vecCaracteristicas[V_OESTE]) {
-                        accion = CasillasAdyacentes.NORTE;
-                    }
-                } else {
-                    accion = CasillasAdyacentes.NORTE;
-                }
-            }
+            accion = elegirAccion();
             tbl.moverPlayer(accion);
             lastVecCaracteristicas = vecCaracteristicas;
             lastAccion = accion;
             tbl.repaint();
         }
+    }
+
+    private CasillasAdyacentes elegirAccion() {
+        CasillasAdyacentes accion = null;
+        if (lastVecCaracteristicas[V_CARDINALES]) {
+            // Por defecto intenta continuar en la misma direccion que la anterior,
+            // si no puede va comprobando si puede rotar en sentido antihorario
+            accion = elegirAccionSeguirParedORotar();
+        } else if (lastVecCaracteristicas[V_INTERCARDINALES] && vecCaracteristicas[V_CARDINALES]) {
+            // "Se encarga de la accion posterior a una rotacion"
+            // Reevalua la direccion que tiene que seguir en el caso posterior a un cambio de direccion
+            // Por defecto intenta continuar en la misma direccion que habia tomado
+            // Si no puede, intenta girar en sentido antihorario
+            accion = elegirAccionPostRotacion();
+        } else if (vecCaracteristicas[V_CARDINALES]) {
+            // "Se encarga de empezar a seguir una pared cuando encuentra una"
+            if (vecCaracteristicas[V_ESTE]) {
+                accion = CasillasAdyacentes.SUR;
+            } else if (vecCaracteristicas[V_OESTE]) {
+                accion = CasillasAdyacentes.NORTE;
+            } else if (vecCaracteristicas[V_NORTE]) {
+                accion = CasillasAdyacentes.ESTE;
+            }
+        } else {
+            // Accion por defecto
+            accion = CasillasAdyacentes.NORTE;
+        }
+        return accion;
+    }
+
+    private CasillasAdyacentes elegirAccionSeguirParedORotar() {
+        CasillasAdyacentes accion = null;
+        if (lastAccion == CasillasAdyacentes.ESTE) {
+            if (!vecCaracteristicas[V_NORTE]) {
+                accion = CasillasAdyacentes.NORTE;
+            } else if (!vecCaracteristicas[V_ESTE]) {
+                accion = CasillasAdyacentes.ESTE;
+            } else if (!vecCaracteristicas[V_SUR]) {
+                accion = CasillasAdyacentes.SUR;
+            } else {
+                accion = CasillasAdyacentes.OESTE;
+            }
+        } else if (lastAccion == CasillasAdyacentes.SUR) {
+            if (!vecCaracteristicas[V_ESTE]) {
+                accion = CasillasAdyacentes.ESTE;
+            } else if (!vecCaracteristicas[V_SUR]) {
+                accion = CasillasAdyacentes.SUR;
+            } else if (!vecCaracteristicas[V_OESTE]) {
+                accion = CasillasAdyacentes.OESTE;
+            } else {
+                accion = CasillasAdyacentes.NORTE;
+            }
+        } else if (lastAccion == CasillasAdyacentes.OESTE) {
+            if (!vecCaracteristicas[V_SUR]) {
+                accion = CasillasAdyacentes.SUR;
+            } else if (!vecCaracteristicas[V_OESTE]) {
+                accion = CasillasAdyacentes.OESTE;
+            } else if (!vecCaracteristicas[V_NORTE]) {
+                accion = CasillasAdyacentes.NORTE;
+            } else {
+                accion = CasillasAdyacentes.ESTE;
+            }
+        } else if (lastAccion == CasillasAdyacentes.NORTE) {
+            if (!vecCaracteristicas[V_OESTE]) {
+                accion = CasillasAdyacentes.OESTE;
+            } else if (!vecCaracteristicas[V_NORTE]) {
+                accion = CasillasAdyacentes.NORTE;
+            } else if (!vecCaracteristicas[V_ESTE]) {
+                accion = CasillasAdyacentes.ESTE;
+            } else {
+                accion = CasillasAdyacentes.SUR;
+            }
+        }
+        return accion;
+    }
+
+    private CasillasAdyacentes elegirAccionPostRotacion() {
+        CasillasAdyacentes accion = null;
+        if (lastAccion == CasillasAdyacentes.ESTE) {
+            if (!vecCaracteristicas[V_ESTE]) {
+                accion = CasillasAdyacentes.ESTE;
+            } else if (!vecCaracteristicas[V_SUR]) {
+                accion = CasillasAdyacentes.SUR;
+            } else {
+                accion = CasillasAdyacentes.OESTE;
+            }
+        } else if (lastAccion == CasillasAdyacentes.SUR) {
+            if (!vecCaracteristicas[V_SUR]) {
+                accion = CasillasAdyacentes.SUR;
+            } else if (!vecCaracteristicas[V_OESTE]) {
+                accion = CasillasAdyacentes.OESTE;
+            } else {
+                accion = CasillasAdyacentes.NORTE;
+            }
+        } else if (lastAccion == CasillasAdyacentes.OESTE) {
+            if (!vecCaracteristicas[V_OESTE]) {
+                accion = CasillasAdyacentes.OESTE;
+            } else if (!vecCaracteristicas[V_NORTE]) {
+                accion = CasillasAdyacentes.NORTE;
+            } else {
+                accion = CasillasAdyacentes.ESTE;
+            }
+        } else if (lastAccion == CasillasAdyacentes.NORTE) {
+            if (!vecCaracteristicas[V_NORTE]) {
+                accion = CasillasAdyacentes.NORTE;
+            } else if (!vecCaracteristicas[V_ESTE]) {
+                accion = CasillasAdyacentes.ESTE;
+            } else {
+                accion = CasillasAdyacentes.SUR;
+            }
+        }
+        return accion;
     }
 
     public void printPercepciones() {
